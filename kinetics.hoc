@@ -1,0 +1,162 @@
+create a
+a	{nseg=1 diam=5 L=5 
+	insert canrgc eca=55
+	insert calrgc eca=45
+	insert pas g_pas=1/10000 Ra=150 cm=1}
+access a
+
+tstop=100
+vlow=-80
+vhigh=40
+dt=0.01
+
+objref gk, b,gt,vc, gs,c, gf,ic
+b = new VBox()
+c = new VBox()
+b.intercept(1)
+gk = new Graph(0)
+gk.view(vlow,0,vhigh-vlow,1,0,0,100,200)
+gk.exec_menu("New Axis")
+gk.exec_menu("10% Zoom out")
+gk.label(0.1,0.9,"Figs.2A-3B-3C: steady-states")
+gk.addexpr("minf_canrgc",3,2, 2*tstop,0,2)
+gk.addexpr("minf_calrgc",4,2, 2*tstop,0,2)
+gk.addexpr("hinf_canrgc",2,2, 2*tstop,0,2)
+
+gt = new Graph(0)
+gt.view(vlow,0,vhigh-vlow,3,0,0,100,200)
+gt.exec_menu("New Axis")
+gt.exec_menu("10% Zoom out")
+gt.label(0.1,0.9,"time constants")
+gt.addexpr("mtau_canrgc",3,2, 2*tstop,0,2)
+gt.addexpr("mtau_calrgc",4,2, 2*tstop,0,2)
+gt.addexpr("htau_canrgc/15",2,2, 2*tstop,0,2)
+
+xpanel("")
+xbutton("run ", "run()")
+xpanel()
+b.intercept(0)
+b.map("Ca kinetics for RGC",100,0,200,400)
+
+c.intercept(1)
+gs = new Graph(0)
+gs.view(0,-200,tstop,200,0,0,100,200)
+gs.exec_menu("New Axis")
+gs.exec_menu("10% Zoom out")
+gs.label(0.1,0.9,"CaL current (pA), Fig.2C, step from -35mV")
+gs.exec_menu("Keep Lines")
+
+gf = new Graph(0)
+gf.view(0,-100,tstop,100,0,0,100,200)
+gf.exec_menu("New Axis")
+gf.exec_menu("10% Zoom out")
+gf.label(0.1,0.9,"CaN current (pA), Fig.3A, step from -110mV")
+gf.exec_menu("Keep Lines")
+
+c.intercept(0)
+c.map("activation",390,0,500,370)
+
+vc = new SEClamp(0.5)
+
+proc run() {
+gk.begin()
+gk.color(2)
+gk.label(0.65,0.7,"CaN inact.")
+gk.color(3)
+gk.label(0.65,0.6,"CaN act.")
+gk.color(4)
+gk.label(0.65,0.5,"CaL act.")
+for (v=vlow; v<vhigh; v=v+1) {
+    trates_calrgc(v)
+    trates_canrgc(v)
+    gk.plot(v)
+}
+gk.flush()
+doNotify()
+
+gt.begin()
+gt.color(2)
+gt.label(0.65,0.75,"tau_inact./15")
+for (v=vlow; v<vhigh; v=v+1) {
+    trates_canrgc(v)
+    trates_calrgc(v)
+    gt.plot(v)
+}
+gt.flush()
+doNotify()
+
+gbar_canrgc=0
+gbar_calrgc=0.008
+gs.color(2)
+gs.label(0.6,0.65,"-20")
+gs.color(3)
+gs.label(0.6,0.33,"-10")
+gs.color(4)
+gs.label(0.6,0.06,"0")
+gs.color(5)
+gs.label(0.6,0.2,"10")
+gs.color(6)
+gs.label(0.6,0.43,"25")
+gs.color(7)
+gs.label(0.6,0.53,"30")
+
+gs.begin()
+k=-35
+color=1
+while (k<31) {
+gs.addexpr("ica*area(0.5)*10",color,1, 2*tstop,0,2) // *10=pA, *1e-2=nA
+t=0
+vc.amp1=-35
+vc.dur1=0.2
+vc.amp2=k
+vc.dur2=tstop
+forall {finitialize(vc.amp1)}
+while (t<tstop) {
+    fadvance()
+    gs.plot(t)
+    }
+gs.flush()
+doNotify()
+if (k==-35 || k==10) {k=k+15} else {k=k+10}
+if (k==35) {k=30}
+color=color+1
+gs.begin()
+}
+
+gbar_canrgc=0.08
+gbar_calrgc=0
+gf.begin()
+gf.color(2)
+gf.label(0.4,0.65,"-25")
+gf.color(3)
+gf.label(0.4,0.49,"5")
+gf.color(4)
+gf.label(0.4,0.41,"0")
+gf.color(5)
+gf.label(0.4,0.33,"20")
+gf.color(6)
+gf.label(0.4,0.57,"30")
+k=-45
+color=1
+while (k<31) {
+gf.addexpr("ica*area(0.5)*10",color,1, 2*tstop,0,2) // *10=pA, *1e-2=nA
+t=0
+vc.amp1=-35
+vc.dur1=0.2
+vc.amp2=k
+vc.dur2=tstop
+forall {finitialize(vc.amp1)}
+while (t<tstop) {
+    fadvance()
+    gf.plot(t)
+    }
+gf.flush()
+doNotify()
+if (k==-5 ) {k=k+5} else {k=k+20}
+if (k==40) {k=30}
+color=color+1
+gf.begin()
+}
+}
+
+
