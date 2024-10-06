@@ -1,6 +1,6 @@
 NEURON mod files for the CaN and CaL currents from the papers:
 Huang and Robinson Neurosci. 85:239 (1998) (exp.)
-Benison et al., J.Theor.Biol. 210:187 (2001) (model).
+Benison et al., *J.Theor.Biol*. 210:187 (2001) (model).
 
 - Running the kinetics.hoc simulation file will show 
 the activation and inactivation steady-states, the time constants, 
@@ -23,9 +23,9 @@ and run the simulation hoc file with the command
 ``` nrngui kinetics.hoc ```
 
 ## Under Windows using NEURON 5.1:
-to compile the mod files use the "mknrndll" command.
+to compile the mod files use the ```mknrndll``` command.
 A double click on the simulation file
-``` kinetics.hoc ```
+kinetics.hoc
 will open the simulation window.
 
 \
@@ -34,3 +34,8 @@ authors of the modeling paper.
 
 Questions on how to use this model with NEURON
 should be directed to michele.migliore@pa.ibf.cnr.it
+
+
+Changelog:
+----------
+2024-10: Converted readme to markdown
